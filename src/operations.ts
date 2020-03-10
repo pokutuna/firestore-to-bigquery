@@ -80,13 +80,13 @@ export async function findLatestExportUrlPrefix(
     namespaceIds: options.namespaces || [''],
   };
 
-  const target = res.data.operations?.find(op =>
-    eqEntityFilter(op.metadata?.entityFilter, expectFilter)
-  );
+  const op = res.data.operations
+    ?.reverse()
+    ?.find(op => eqEntityFilter(op.metadata?.entityFilter, expectFilter));
 
-  if (!target) {
+  if (!op) {
     throw new Error('There are no export operations.');
   }
 
-  return target.metadata!.outputUrlPrefix;
+  return op.metadata!.outputUrlPrefix;
 }
