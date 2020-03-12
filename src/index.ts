@@ -13,4 +13,4 @@ export {
   requestLoadToBigQuery,
 } from './task';
 
-export {makePubSubFunction} from './impl';
+export {makeFunction} from './impl';
