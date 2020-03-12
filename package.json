@@ -1,8 +1,14 @@
 {
   "name": "@pokutuna/firestore-to-bigquery",
+  "description": "A utility for periodically export Cloud Firestore & Datastore and load to BigQuery.",
   "version": "0.0.1",
-  "main": "build/src/index.js",
-  "license": "MIT",
+  "author": "pokutuna <popopopopokutuna@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/pokutuna/firestore-to-bigquery/issues"
+  },
+  "dependencies": {
+    "googleapis": "^47.0.0"
+  },
   "devDependencies": {
     "@types/express": "^4.17.3",
     "@types/jest": "^25.1.4",
@@ -16,15 +22,25 @@
     "ts-node": "^8.6.2",
     "typescript": "~3.7.0"
   },
-  "dependencies": {
-    "googleapis": "^47.0.0"
+  "files": [
+    "build"
+  ],
+  "homepage": "https://github.com/pokutuna/firestore-to-bigquery#readme",
+  "license": "MIT",
+  "main": "build/src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pokutuna/firestore-to-bigquery.git"
   },
   "scripts": {
-    "test": "jest",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
     "fix": "gts fix",
-    "posttest": "yarn run check"
+    "posttest": "yarn run check",
+    "test": "jest"
   }
 }
