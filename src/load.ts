@@ -1,22 +1,10 @@
 import {google} from 'googleapis';
 import {bigquery_v2} from 'googleapis/build/src/apis/bigquery/v2';
+import {CommonOptions} from './common';
 
 const scopes = ['https://www.googleapis.com/auth/bigquery'];
 
-export interface LoadToBigQueryOptions {
-  projectId: string;
-
-  /**
-   * Defaults to [""] (this means default namespace)
-   */
-  namespaces?: string[];
-
-  /**
-   * Names of kind (Datastore mode) or collection (Firestore mode) to load to BigQuery.
-   * This is used for table name.
-   */
-  kinds: string[];
-
+export interface LoadToBigQueryOptions extends CommonOptions {
   /**
    * A location path to export data on Google Cloud Storage.
    * This must be a string starting with "gs://..."

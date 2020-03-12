@@ -1,5 +1,6 @@
 import {google} from 'googleapis';
 import {datastore_v1} from 'googleapis/build/src/apis/datastore/v1';
+import {CommonOptions} from './common';
 
 const scopes = [
   'https://www.googleapis.com/auth/datastore',
@@ -32,16 +33,7 @@ export function eqEntityFilter(
   );
 }
 
-export interface FindLatestExportUrlPrefixOptions {
-  projectId: string;
-
-  /**
-   * Defaults to [""] (this means default namespace)
-   */
-  namespaces?: string[];
-
-  kinds: string[];
-
+export interface FindLatestExportUrlPrefixOptions extends CommonOptions {
   /**
    * The filter value to search operations recent days of this value.
    * Cannot find the import target correctly if there are over 1000 exports in this period.

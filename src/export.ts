@@ -1,14 +1,7 @@
 import {google, datastore_v1} from 'googleapis';
+import {CommonOptions} from './common';
 
-export interface ExportOptions {
-  projectId: string;
-
-  /**
-   * Defaults to [""] (this means default namespace)
-   */
-  namespaces?: string[];
-
-  kinds: string[];
+export interface ExportOptions extends CommonOptions {
   bucket: string;
 }
 
