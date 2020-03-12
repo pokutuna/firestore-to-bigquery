@@ -1,6 +1,6 @@
 import {ExportOptions} from './export';
 import {
-  requestExportDatastore,
+  requestExportFirestore,
   requestLoadToBigQuery,
   LoadOptions,
 } from './task';
@@ -9,10 +9,10 @@ type PubSubMessage = {data: Buffer};
 
 /**
  * @example
- * const { makePubSubFunction } = require('@pokutuna/datastore-to-biguqery');
+ * const { makePubSubFunction } = require('@pokutuna/firestore-to-biguqery');
  *
  * // Function to deploy Cloud Functions subscribing Pub/Sub
- * export const syncDatastoreToBigquery = makePubSubFunction({
+ * export const syncToBigquery = makePubSubFunction({
  *   projectId: "my-project",
  *   kinds: ["foo", "bar"],
  *   exportBucket: "",
@@ -33,7 +33,7 @@ export async function makePubSubFunction(options: ExportOptions & LoadOptions) {
     );
 
     if (data.action === 'export') {
-      await requestExportDatastore(options);
+      await requestExportFirestore(options);
     }
 
     if (data.action === 'load') {

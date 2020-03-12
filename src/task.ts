@@ -5,7 +5,7 @@ import {
 } from './operations';
 import {loadToBigQuery, LoadToBigQueryOptions} from './load';
 
-export async function requestExportDatastore(options: ExportOptions) {
+export async function requestExportFirestore(options: ExportOptions) {
   return exportDatastore(options);
 }
 

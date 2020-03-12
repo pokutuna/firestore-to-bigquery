@@ -1,5 +1,5 @@
 {
-  "name": "@pokutuna/datastore-to-bigquery",
+  "name": "@pokutuna/firestore-to-bigquery",
   "version": "0.0.1",
   "main": "build/src/index.js",
   "license": "MIT",

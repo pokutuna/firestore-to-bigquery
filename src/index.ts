@@ -8,7 +8,7 @@ export {
 export {loadToBigQuery, LoadToBigQueryOptions} from './load';
 
 export {
-  requestExportDatastore,
+  requestExportFirestore,
   LoadOptions,
   requestLoadToBigQuery,
 } from './task';
