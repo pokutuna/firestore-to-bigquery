@@ -5,14 +5,14 @@ import {
   LoadOptions,
 } from './task';
 
-type PubSubMessage = {data: Buffer};
+import {Request, Response} from 'express';
 
 /**
  * @example
  * const { makePubSubFunction } = require('@pokutuna/firestore-to-biguqery');
  *
- * // Function to deploy Cloud Functions subscribing Pub/Sub
- * export const syncToBigquery = makePubSubFunction({
+ * // Function to deploy Cloud Functions with http trigger
+ * export const syncToBigquery = makeFunction({
  *   projectId: "my-project",
  *   kinds: ["foo", "bar"],
  *   exportBucket: "",
@@ -26,21 +26,21 @@ type PubSubMessage = {data: Buffer};
  *   },
  * });
  */
-export async function makePubSubFunction(options: ExportOptions & LoadOptions) {
-  return async (message: PubSubMessage) => {
-    const data = JSON.parse(
-      Buffer.from((message.data || '').toString(), 'base64').toString()
-    );
+export async function makeFunction(options: ExportOptions & LoadOptions) {
+  return async (req: Request, res: Response) => {
+    const action = req.body.action;
 
-    if (data.action === 'export') {
+    if (action === 'export') {
       await requestExportFirestore(options);
+      return res.status(204);
     }
 
-    if (data.action === 'load') {
+    if (action === 'load') {
       await requestLoadToBigQuery(options);
+      return res.status(204);
     }
 
     console.warn('action not found');
-    return;
+    return res.status(400);
   };
 }
