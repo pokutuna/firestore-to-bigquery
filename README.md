@@ -1,7 +1,18 @@
-firestore-to-bigquery
+@pokutuna/firestore-to-bigquery
 ===
 
+[![Actions Status](https://github.com/pokutuna/firestore-to-bigquery/workflows/test/badge.svg)](https://github.com/pokutuna/firestore-to-bigquery/actions)
+[![npm (scoped)](https://img.shields.io/npm/v/@pokutuna/firestore-to-bigquery)](https://www.npmjs.com/package/@pokutuna/firestore-to-bigquery)
+
+A utility for periodically export Cloud Firestore & Datastore and load to BigQuery.
+
 ![sequence](misc/sequence.png)
+
+## Create a bucket on Cloud Storage
+
+- The locations must be same as Cloud Firestore (Datastore).
+- (Recommend) Set the TTL rule to the bucket to delete exported objects.
+  - [Object Lifecycle Management  |  Cloud Storage  |  Google Cloud](https://cloud.google.com/storage/docs/lifecycle)
 
 ## Create a function on Cloud Functions
 
@@ -24,7 +35,7 @@ export const app = makeFunction({
     location: "asia-northeast1",
   },
   // Callback for partitioning.
-  timePartitionedBy: (kind) => {
+  timePartitionBy: (kind) => {
     if (kind === "foo") return { field: "createdAt" };
     return undefined;
   },
@@ -35,25 +46,23 @@ export const app = makeFunction({
 
 ### Required Roles
 
+- `roles/datastore.importExportAdmin`
+- `roles/storage.admin`
+- `roles/bigquery.user`
+
 Give these roles to runtime service account on Cloud IAM.  
 Use the default service account `PROJECT_ID@appspot.gserviceaccount.com` OR create and deploy with another service account `--service-account=...`
 
 [Function Identity  |  Cloud Functions Documentation  |  Google Cloud](https://cloud.google.com/functions/docs/securing/function-identity)
-
-- `roles/datastore.importExportAdmin`
-- `roles/object.admin`
-  - `roles/storage.admin` が必要かも?
-- `roles/bigquery.user`
-  - `roles/bigquery.jobUser` と `roles/bigquery.dataEditor` のほうがいい?
 
 
 ## Create 2 schedulers on Create Scheduler
 
 ### Export Firestore
 ```
-$ gcloud beta scheduler jobs create http kick-export \
+$ gcloud scheduler jobs create http kick-export \
   --time-zone "Asia/Tokyo" \
-  --schedule="* 2 * * *" \
+  --schedule="17 2 * * *" \
   --uri="{YOUR_FUNCTION_URL}" \
   --headers="Content-Type=application/json" \
   --http-method="POST" \
@@ -62,9 +71,9 @@ $ gcloud beta scheduler jobs create http kick-export \
 
 ### Load to BigQuery
 ```
-$ gcloud beta scheduler jobs create http kick-load \
+$ gcloud scheduler jobs create http kick-load \
   --time-zone "Asia/Tokyo" \
-  --schedule="* 4 * * *" \
+  --schedule="23 4 * * *" \
   --uri="{YOUR_FUNCTION_URL}" \
   --headers="Content-Type=application/json" \
   --http-method="POST" \
