@@ -1,5 +1,5 @@
-import { google } from 'googleapis';
-import { bigquery_v2 } from 'googleapis/build/src/apis/bigquery/v2';
+import {google} from 'googleapis';
+import {bigquery_v2} from 'googleapis/build/src/apis/bigquery/v2';
 
 const scopes = ['https://www.googleapis.com/auth/bigquery'];
 
@@ -35,6 +35,12 @@ export interface LoadToBigQueryOptions {
      * If you give more than 1 namespace, this loads data to ${dataset_id}_${namespace}
      */
     datasetId: string;
+
+    /**
+     * The location for creating dataset if not present.
+     * Defaults to "US" from BigQuery
+     */
+    location?: string;
   };
 
   /**
@@ -94,22 +100,24 @@ export function makePartitioning(
   kind: string
 ): LoadJobUnit['partitioning'] {
   const timePartitioning = options.timePartitionedBy?.(kind);
-  if (timePartitioning) return { timePartitioning };
+  if (timePartitioning) return {timePartitioning};
 
   const rangePartitioning = options.rangePartitionedBy?.(kind);
-  if (rangePartitioning) return { rangePartitioning };
+  if (rangePartitioning) return {rangePartitioning};
 
   return undefined;
 }
 
 export interface LoadJobUnit {
   sourcePath: string;
+  projectId: string;
   datasetId: string;
   tableId: string;
   partitioning:
-    | { timePartitioning: bigquery_v2.Schema$TimePartitioning }
-    | { rangePartitioning: bigquery_v2.Schema$RangePartitioning }
+    | {timePartitioning: bigquery_v2.Schema$TimePartitioning}
+    | {rangePartitioning: bigquery_v2.Schema$RangePartitioning}
     | undefined;
+  location?: string;
 }
 
 export function expandToJobs(options: LoadToBigQueryOptions): LoadJobUnit[] {
@@ -120,9 +128,11 @@ export function expandToJobs(options: LoadToBigQueryOptions): LoadJobUnit[] {
     options.kinds.forEach(kind => {
       units.push({
         sourcePath: makeSourcePath(options.sourceUrlPrefix, ns, kind),
+        projectId: options.destination.projectId || options.projectId,
         datasetId: makeDatasetId(options.destination.datasetId, namespaces, ns),
         tableId: kind,
         partitioning: makePartitioning(options, kind),
+        location: options.destination.location,
       });
     });
   });
@@ -130,16 +140,51 @@ export function expandToJobs(options: LoadToBigQueryOptions): LoadJobUnit[] {
   return units;
 }
 
+// TODO improve this
+type AuthClient = bigquery_v2.Params$Resource$Datasets$List['auth'];
+export async function createDatasetIfNotExists(
+  auth: AuthClient,
+  job: LoadJobUnit
+) {
+  const bq = google.bigquery('v2');
+  const res = await bq.datasets.get(
+    {
+      auth,
+      projectId: job.projectId,
+      datasetId: job.datasetId,
+    },
+    {
+      validateStatus: code => 200 <= code || code < 300 || code === 404,
+    }
+  );
+  if (res.status === 404) {
+    await bq.datasets.insert({
+      auth,
+      projectId: job.projectId,
+      requestBody: {
+        datasetReference: {
+          projectId: job.projectId,
+          datasetId: job.datasetId,
+        },
+        location: job.location,
+      },
+    });
+  }
+}
+
 export async function loadToBigQuery(options: LoadToBigQueryOptions) {
-  const auth = new google.auth.GoogleAuth({ scopes });
+  const auth = new google.auth.GoogleAuth({
+    scopes,
+    projectId: options.projectId,
+  });
   const authClient = await auth.getClient();
 
-  const jobs = expandToJobs(options);
-
+  const units = expandToJobs(options);
   const bq = google.bigquery('v2');
+  const jobs = units.map(async job => {
+    await createDatasetIfNotExists(authClient, job);
 
-  jobs.map(async job =>
-    bq.jobs.insert({
+    return bq.jobs.insert({
       auth: authClient,
       projectId: options.projectId,
       requestBody: {
@@ -149,7 +194,7 @@ export async function loadToBigQuery(options: LoadToBigQueryOptions) {
         configuration: {
           load: {
             destinationTable: {
-              projectId: options.destination.projectId || options.projectId,
+              projectId: job.projectId,
               datasetId: job.datasetId,
               tableId: job.tableId,
             },
@@ -163,6 +208,8 @@ export async function loadToBigQuery(options: LoadToBigQueryOptions) {
           },
         },
       },
-    })
-  );
+    });
+  });
+
+  return Promise.all(jobs);
 }
