@@ -1,0 +1,21 @@
+@startuml sequence
+
+participant "Cloud\nScheduler" as scheduler
+
+participant "Cloud\nFunctions\n(http trigger)" as functions
+
+database "Cloud\nFirestore" as firestore
+
+collections "Cloud\nStorage" as storage
+
+database "BigQuery" as bigquery
+
+scheduler ->> functions : POST\n{ action: "export" }
+functions ->> firestore : request export
+firestore ->> storage : write
+
+scheduler ->> functions : POST\n{ action: "load" }
+functions ->> bigquery : request load
+bigquery ->> storage : read
+
+@enduml
