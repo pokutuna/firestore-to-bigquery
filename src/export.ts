@@ -2,7 +2,7 @@ import {google, datastore_v1} from 'googleapis';
 import {CommonOptions} from './common';
 
 export interface ExportOptions extends CommonOptions {
-  bucket: string;
+  exportBucket: string;
 }
 
 const scopes = [
@@ -28,7 +28,7 @@ export async function exportDatastore(
         kinds: options.kinds,
         namespaceIds: options.namespaces || [''],
       },
-      outputUrlPrefix: `gs://${options.bucket}`,
+      outputUrlPrefix: `gs://${options.exportBucket}`,
     },
   });
   return res.data;

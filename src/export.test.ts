@@ -16,7 +16,7 @@ test('exportData', async () => {
   await exportDatastore({
     projectId: 'test',
     kinds: ['foo', 'bar'],
-    bucket: 'my-bucket',
+    exportBucket: 'my-bucket',
   });
 
   expect(datastore.projects.export).toBeCalledWith(
