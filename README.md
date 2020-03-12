@@ -24,7 +24,7 @@ export const app = makeFunction({
     location: "asia-northeast1",
   },
   // Callback for partitioning.
-  timePartitionBy: (kind) => {
+  timePartitionedBy: (kind) => {
     if (kind === "foo") return { field: "createdAt" };
     return undefined;
   },

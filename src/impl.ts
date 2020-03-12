@@ -7,25 +7,6 @@ import {
 
 import {Request, Response} from 'express';
 
-/**
- * @example
- * const { makePubSubFunction } = require('@pokutuna/firestore-to-biguqery');
- *
- * // Function to deploy Cloud Functions with http trigger
- * export const syncToBigquery = makeFunction({
- *   projectId: "my-project",
- *   kinds: ["foo", "bar"],
- *   exportBucket: "",
- *   destination: {
- *     datasetId: "datastore",
- *     location: "asia-northeast1",
- *   },
- *   timePartitionBy: (kind) => {
- *     if (kind === "foo") return { field: "createdAt" };
- *     return undefined;
- *   },
- * });
- */
 export async function makeFunction(options: ExportOptions & LoadOptions) {
   return async (req: Request, res: Response) => {
     const action = req.body.action;
