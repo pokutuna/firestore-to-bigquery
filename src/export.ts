@@ -1,4 +1,4 @@
-import { google, datastore_v1 } from 'googleapis';
+import {google, datastore_v1} from 'googleapis';
 
 export interface ExportOptions {
   projectId: string;
@@ -12,20 +12,18 @@ export interface ExportOptions {
   bucket: string;
 }
 
-
 const scopes = [
   'https://www.googleapis.com/auth/cloud-platform',
   'https://www.googleapis.com/auth/datastore',
 ];
 
-// requires
-// - roles/datastore.importExportAdmin
-// - roles/storage.admin
-
 export async function exportDatastore(
   options: ExportOptions
 ): Promise<datastore_v1.Schema$GoogleLongrunningOperation> {
-  const auth = new google.auth.GoogleAuth({ scopes });
+  const auth = new google.auth.GoogleAuth({
+    scopes,
+    projectId: options.projectId,
+  });
   const authClient = await auth.getClient();
 
   const datastore = google.datastore('v1');
@@ -40,5 +38,5 @@ export async function exportDatastore(
       outputUrlPrefix: `gs://${options.bucket}`,
     },
   });
-  return (res as any).data;
+  return res.data;
 }

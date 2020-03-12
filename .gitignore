@@ -1,4 +1,4 @@
-*.json
+key.json
 build/
 
 # Logs
