@@ -1,18 +1,19 @@
-import { google } from 'googleapis';
-import { datastore_v1 } from 'googleapis/build/src/apis/datastore/v1';
+import {google} from 'googleapis';
+import {datastore_v1} from 'googleapis/build/src/apis/datastore/v1';
 
 const scopes = [
   'https://www.googleapis.com/auth/datastore',
   'https://www.googleapis.com/auth/cloud-platform',
 ];
 
-function subtractDaysFromNow(days: number): Date {
+export function subtractDaysFromNow(days: number): Date {
   const offset = 24 * 60 * 60 * 1000 * days;
   return new Date(Date.now() - offset);
 }
 
-function eqSet<T>(a: Set<T>, b: Set<T>): boolean {
-  return a.size === b.size && [...a].every(v => b.has(v));
+export function eqAsSet<T>(a?: T[] | null, b?: T[] | null): boolean {
+  const [sa, sb] = [new Set(a), new Set(b)];
+  return sa.size === sb.size && [...sa].every(v => sb.has(v));
 }
 
 // Note
@@ -21,10 +22,13 @@ function eqSet<T>(a: Set<T>, b: Set<T>): boolean {
 // https://cloud.google.com/datastore/docs/reference/admin/rest/Shared.Types/EntityFilter
 type EntityFilter = datastore_v1.Schema$GoogleDatastoreAdminV1EntityFilter;
 
-function eqEntityFilter(input: EntityFilter, expect: EntityFilter): boolean {
+export function eqEntityFilter(
+  input: EntityFilter,
+  expect: EntityFilter
+): boolean {
   return (
-    eqSet(new Set(input.kinds), new Set(expect.kinds)) &&
-    eqSet(new Set(input.namespaceIds), new Set(expect.namespaceIds))
+    eqAsSet(input.kinds, expect.kinds) &&
+    eqAsSet(input.namespaceIds, expect.namespaceIds)
   );
 }
 
@@ -57,7 +61,10 @@ export async function findLatestExportUrlPrefix(
     `metadata.common.endTime >= "${before}"`,
   ].join(' AND ');
 
-  const auth = new google.auth.GoogleAuth({ scopes });
+  const auth = new google.auth.GoogleAuth({
+    scopes,
+    projectId: options.projectId,
+  });
   const authClient = await auth.getClient();
 
   const datastore = google.datastore('v1');
@@ -80,13 +87,10 @@ export async function findLatestExportUrlPrefix(
     namespaceIds: options.namespaces || [''],
   };
 
+  // ordered by asc
   const op = res.data.operations
     ?.reverse()
     ?.find(op => eqEntityFilter(op.metadata?.entityFilter, expectFilter));
 
-  if (!op) {
-    throw new Error('There are no export operations.');
-  }
-
-  return op.metadata!.outputUrlPrefix;
+  return op?.metadata?.outputUrlPrefix;
 }
