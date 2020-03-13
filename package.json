@@ -1,7 +1,7 @@
 {
   "name": "@pokutuna/firestore-to-bigquery",
   "description": "A utility for periodically export Cloud Firestore & Datastore and load to BigQuery.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "pokutuna <popopopopokutuna@gmail.com>",
   "bugs": {
     "url": "https://github.com/pokutuna/firestore-to-bigquery/issues"
