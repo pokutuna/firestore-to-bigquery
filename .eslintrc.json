@@ -8,6 +8,9 @@
   "env": {
     "jest/globals": true
   },
+  "ignorePatterns": [
+    "build/"
+  ],
   "overrides": [
     {
       "files": [
