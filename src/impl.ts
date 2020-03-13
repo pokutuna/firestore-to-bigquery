@@ -5,10 +5,12 @@ import {
   LoadOptions,
 } from './task';
 
-import {Request, Response} from 'express';
+import {RequestHandler} from 'express';
 
-export function makeFunction(options: ExportOptions & LoadOptions) {
-  return async (req: Request, res: Response) => {
+export function makeFunction(
+  options: ExportOptions & LoadOptions
+): RequestHandler {
+  return async (req, res) => {
     const action = req.body.action;
 
     if (action === 'export') {
