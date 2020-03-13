@@ -41,6 +41,7 @@
     "compile": "tsc -p .",
     "fix": "gts fix",
     "posttest": "yarn run check",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "yarn run compile"
   }
 }
