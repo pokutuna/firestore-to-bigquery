@@ -14,7 +14,7 @@ export function subtractDaysFromNow(days: number): Date {
 
 export function eqAsSet<T>(a?: T[] | null, b?: T[] | null): boolean {
   const [sa, sb] = [new Set(a), new Set(b)];
-  return sa.size === sb.size && [...sa].every(v => sb.has(v));
+  return sa.size === sb.size && [...sa].every((v) => sb.has(v));
 }
 
 // Note
@@ -82,7 +82,7 @@ export async function findLatestExportUrlPrefix(
   // ordered by asc
   const op = res.data.operations
     ?.reverse()
-    ?.find(op => eqEntityFilter(op.metadata?.entityFilter, expectFilter));
+    ?.find((op) => eqEntityFilter(op.metadata?.entityFilter, expectFilter));
 
   return op?.metadata?.outputUrlPrefix;
 }
