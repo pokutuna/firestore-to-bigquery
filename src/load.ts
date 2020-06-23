@@ -55,7 +55,7 @@ export function translateNamespaces(
 ): string[] {
   if (!namespaces) return ['default'];
   if (namespaces.length === 0) return ['all'];
-  return namespaces.map(ns => (ns === '' ? 'default' : ns));
+  return namespaces.map((ns) => (ns === '' ? 'default' : ns));
 }
 
 export function makeSourcePath(
@@ -112,8 +112,8 @@ export function expandToJobs(options: LoadToBigQueryOptions): LoadJobUnit[] {
   const units: LoadJobUnit[] = [];
 
   const namespaces = translateNamespaces(options.namespaces);
-  namespaces.forEach(ns => {
-    options.kinds.forEach(kind => {
+  namespaces.forEach((ns) => {
+    options.kinds.forEach((kind) => {
       units.push({
         sourcePath: makeSourcePath(options.sourceUrlPrefix, ns, kind),
         projectId: options.destination.projectId || options.projectId,
@@ -142,7 +142,7 @@ export async function createDatasetIfNotExists(
       datasetId: job.datasetId,
     },
     {
-      validateStatus: code => 200 <= code || code < 300 || code === 404,
+      validateStatus: (code) => 200 <= code || code < 300 || code === 404,
     }
   );
   if (res.status === 404) {
@@ -169,7 +169,7 @@ export async function loadToBigQuery(options: LoadToBigQueryOptions) {
 
   const units = expandToJobs(options);
   const bq = google.bigquery('v2');
-  const jobs = units.map(async job => {
+  const jobs = units.map(async (job) => {
     await createDatasetIfNotExists(authClient, job);
 
     return bq.jobs.insert({
